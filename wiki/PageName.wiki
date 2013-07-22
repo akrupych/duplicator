@@ -1,13 +1,25 @@
-#summary This is summary
+=Heading1=
+==Heading2==
+===Heading3===
 
-= Introduction =
+*bold*     _italic_
+`inline code`
+escape: `*`
 
-Add your content here.
+Indent lists 2 spaces:
+  * bullet item
+  # numbered list
 
+{{{
+verbatim code block
+}}}
 
-= Details =
+Horizontal rule
+---- 
 
-Add your content here.  Format your content with:
-  * Text in *bold* or _italic_
-  * Headings, paragraphs, and lists
-  * Automatic links to other wiki pages
+WikiWordLink
+[http://domain/page label]
+
+http://google.com
+
+|| table || cells ||
