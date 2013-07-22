@@ -6,13 +6,13 @@
     * Set progress bar maximum to selected files number
     * For each file:
       * Calculate MD5 (http://stackoverflow.com/questions/10520048/calculate-md5-checksum-for-a-file)
-      * Increase ProgressBar value
+      * Increase !ProgressBar value
     * Remove files with different sums from map
     * _Optional._ The same sum is 99.9% of similarity, but there's a chance of different files with the same checksum. But we can always perform byte comparison..
-    * Populate TreeView (or other) control with results
-    * _Optional._ Fire some MessageBox
+    * Populate !TreeView (or other) control with results
+    * _Optional._ Fire some !MessageBox
   * Cancel:
     * Stop traversing and calculating
-  * Click on TreeView item with file name:
+  * Click on !TreeView item with file name:
     * Subitems are opened with pathes of duplicated file
     * _Optional._ Perform some actions with selected file
