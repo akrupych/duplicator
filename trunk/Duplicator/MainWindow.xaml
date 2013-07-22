@@ -8,12 +8,11 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         <Label x:Name="FolderPath" Content="Folder path: " HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Width="80"/>
-        <TextBox x:Name="Viewing" HorizontalAlignment="Left" Height="23" Margin="90,14,0,0" TextWrapping="Wrap" Text="viewing" VerticalAlignment="Top" Width="530" Grid.ColumnSpan="2"/>
-        <Button x:Name="Search" Content="..." HorizontalAlignment="Left" Margin="292,14,0,0" VerticalAlignment="Top" Width="40" Height="23" Grid.Column="1"/>
+        <TextBox x:Name="Viewing" HorizontalAlignment="Left" Height="23" Margin="90,14,0,0" TextWrapping="Wrap" Text="viewing" VerticalAlignment="Top" Width="504" Grid.ColumnSpan="2"/>
+        <Button x:Name="Search" Content="..." HorizontalAlignment="Left" Margin="257,14,0,0" VerticalAlignment="Top" Width="75" Height="23" Grid.Column="1"/>
         <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="10,52,0,0" VerticalAlignment="Top" Width="75" FlowDirection="RightToLeft" Foreground="Red"/>
-        <ProgressBar x:Name="Progressing" HorizontalAlignment="Left" Height="10" Margin="90,62,0,0" VerticalAlignment="Top" Width="497" Grid.ColumnSpan="2"/>
+        <ProgressBar x:Name="Progressing" HorizontalAlignment="Left" Height="20" Margin="90,52,0,0" VerticalAlignment="Top" Width="504" Grid.ColumnSpan="2"/>
         <Button x:Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="257,52,0,0" VerticalAlignment="Top" Width="75" FlowDirection="RightToLeft" Foreground="#FF2E00FF" Grid.Column="1"/>
-        <Label x:Name="Persent" Content="percent" HorizontalAlignment="Left" Margin="319,37,0,0" VerticalAlignment="Top" Height="25" FontSize="10" Grid.ColumnSpan="2"/>
         <Label x:Name="ThisFile" Content="This file:" HorizontalAlignment="Left" Margin="10,106,0,0" VerticalAlignment="Top"/>
         <Label x:Name="IsDuplicatedHere" Content="is duplicated here:" HorizontalAlignment="Left" Margin="10,106,0,0" VerticalAlignment="Top" Grid.Column="1"/>
         <ListBox x:Name="SoughtFile" HorizontalAlignment="Left" Height="249" Margin="10,132,0,0" VerticalAlignment="Top" Width="322"/>
