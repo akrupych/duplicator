@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace Duplicator
 {
+    /// <summary>
+    /// Background worker, responsible for duplicates locating.
+    /// Call RunWorkerAsync(Path) to start the show!
+    /// </summary>
     class DuplicatesFinder : BackgroundWorker
     {
         /// <summary>
