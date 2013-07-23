@@ -3,15 +3,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="MainWindow" Height="428" Width="690" ResizeMode="NoResize">
     <Grid>
-        <Label x:Name="FolderPath" Content="Folder path: " HorizontalAlignment="Left" Margin="12,14,0,0" VerticalAlignment="Top" Width="80"/>
-        <TextBox x:Name="Viewing" HorizontalAlignment="Left" Height="24" Margin="93,12,0,0" TextWrapping="Wrap" Text="viewing" Width="482"  VerticalAlignment="Top" />
-        <Button x:Name="Search" Content="..." HorizontalAlignment="Left" Margin="581,12,0,0" VerticalAlignment="Top" Width="75" Height="23" />
-        <Button x:Name="Start" Content="Start" HorizontalAlignment="Left" Margin="12,52,0,0" VerticalAlignment="Top" Width="75" Foreground="Red"/>
-        <ProgressBar x:Name="Progressing" HorizontalAlignment="Left" Height="22" Margin="93,52,0,0" VerticalAlignment="Top" Width="482" />
-        <Button x:Name="Cancel" Content="Cancel" HorizontalAlignment="Left" Margin="581,52,0,0" VerticalAlignment="Top" Width="75" FlowDirection="RightToLeft" Foreground="#FF2E00FF" />
-        <Label x:Name="ThisFile" Content="This file:" HorizontalAlignment="Left" Margin="127,95,0,0" VerticalAlignment="Top" FontSize="20" />
-        <Label x:Name="IsDuplicatedHere" Content="is duplicated here:" HorizontalAlignment="Left" Margin="413,95,0,0" VerticalAlignment="Top" FontSize="20" />
-        <ListBox x:Name="SoughtFile" HorizontalAlignment="Left" Height="249" Margin="10,132,0,0" VerticalAlignment="Top" Width="322"/>
-        <ListBox x:Name="ItsDuplicates" HorizontalAlignment="Right" Height="249" Margin="10,132,10,0" VerticalAlignment="Top" Width="322"/>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="15*"/>
+            <ColumnDefinition Width="70*"/>
+            <ColumnDefinition Width="15*"/>
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="10*"/>
+            <RowDefinition Height="80*"/>
+        </Grid.RowDefinitions>
+        <Label Content="Select Folder: " Grid.Column="0" Grid.Row="0"/>
+        <TextBox Text="" Grid.Column="1" Grid.Row="0"/>
+        <Button Content="Browse..." Click="{Binding BrowseCommand} " Grid.Column="2" Grid.Row="0"/>
+        <Button Content="Start" Click="{Binding StartCommand} " Grid.Column="0" Grid.Row="1"/>
+        <ProgressBar Grid.Column="1" Grid.Row="1"/>
+        <Button Content="Cancel" Click="{Binding CancelCommand} " Grid.Column="2" Grid.Row="1"/>
+        <TreeView Grid.ColumnSpan="3" Grid.Row="3">
+       
+        </TreeView>
     </Grid>
 </Window>
