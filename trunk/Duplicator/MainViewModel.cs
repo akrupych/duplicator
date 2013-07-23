@@ -5,15 +5,29 @@ using System.Text;
 using GalaSoft.MvvmLight;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
+using System.Windows.Forms;
 
 namespace Duplicator
 {
     public class MainViewModel: ViewModelBase
     {
+        string path;
         ICommand _browseCommand;
         ICommand _startCommand;
         ICommand _cancelCommand;
 
+        public string Path
+        {
+            get
+            {
+                return path;
+            }
+            set
+            {
+                path = value;
+                RaisePropertyChanged("Path");
+            }
+        }
         public ICommand BrowseCommand
         {
             get
@@ -55,7 +69,11 @@ namespace Duplicator
         /// </summary>
         public void BrowseExecute()
         {
-            
+            var dlg = new FolderBrowserDialog();
+            dlg.ShowNewFolderButton = false;
+            DialogResult result = dlg.ShowDialog();
+            if (result == DialogResult.OK)
+                Path = dlg.SelectedPath;
         }
 
         /// <summary>
