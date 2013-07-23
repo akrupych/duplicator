@@ -20,9 +20,17 @@ namespace Duplicator
     /// </summary>
     public partial class MainWindow : Window
     {
+        MainViewModel mainViewModel;
         public MainWindow()
         {
+            mainViewModel = new MainViewModel();
+            this.DataContext = mainViewModel;
             InitializeComponent();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }
