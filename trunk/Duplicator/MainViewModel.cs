@@ -9,12 +9,17 @@ using System.Windows.Forms;
 
 namespace Duplicator
 {
-    public class MainViewModel: ViewModelBase
+    public class MainViewModel: ViewModelBase, IWorkerObserver
     {
-        string path;
-        ICommand _browseCommand;
-        ICommand _startCommand;
-        ICommand _cancelCommand;
+        #region Fields
+
+        private string path;
+
+        private ICommand _browseCommand;
+        private ICommand _startCommand;
+        private ICommand _cancelCommand;
+
+        private DuplicatesFinder Worker { get; set; }
 
         public string Path
         {
@@ -64,6 +69,15 @@ namespace Duplicator
             }
         }
 
+        #endregion
+
+        #region Methods
+
+        public MainViewModel()
+        {
+            Worker = new DuplicatesFinder(this);
+        }
+
         /// <summary>
         /// Defines the method to call when the BrowseCommand is invoked
         /// </summary>
@@ -81,7 +95,8 @@ namespace Duplicator
         /// </summary>
         public void StartExecute()
         {
-
+            System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
+            Worker.RunWorkerAsync(Path);
         }
 
         /// <summary>
@@ -89,7 +104,24 @@ namespace Duplicator
         /// </summary>
         public void CancelExecute()
         {
-
+            Worker.CancelAsync();
         }
+
+        public void OnWorkerProgressUpdate(int percents)
+        {
+            if (percents == 0)
+                System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+        }
+
+        public void OnWorkerComplete()
+        {
+            MessageBox.Show("Completed!");
+        }
+
+        public void OnWorkerThrownException(Exception e)
+        {
+        }
+
+        #endregion
     }
 }
