@@ -14,7 +14,7 @@
             <RowDefinition Height="80*"/>
         </Grid.RowDefinitions>
         <Label HorizontalAlignment="Right" VerticalAlignment="Center" Content="Select Folder:" Grid.Column="0" Grid.Row="0"/>
-        <TextBox Margin="5" Text="" Grid.Column="1" Grid.Row="0"/>
+        <TextBox Margin="5" Text="{Binding Path=Path, Mode=TwoWay}" Grid.Column="1" Grid.Row="0"/>
         <Button Margin="5" Content="Browse..." Command="{Binding BrowseCommand}" Grid.Column="2" Grid.Row="0"/>
         <Button Margin="5" Content="Start" Command="{Binding StartCommand}" Grid.Column="0" Grid.Row="1"/>
         <ProgressBar Margin="5" Grid.Column="1" Grid.Row="1"/>
