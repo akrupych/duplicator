@@ -15,10 +15,10 @@
         </Grid.RowDefinitions>
         <Label Content="Select Folder: " Grid.Column="0" Grid.Row="0"/>
         <TextBox Text="" Grid.Column="1" Grid.Row="0"/>
-        <Button Content="Browse..." Click="{Binding BrowseCommand} " Grid.Column="2" Grid.Row="0"/>
-        <Button Content="Start" Click="{Binding StartCommand} " Grid.Column="0" Grid.Row="1"/>
+        <Button Content="Browse..." Command="{Binding BrowseCommand}" Grid.Column="2" Grid.Row="0"/>
+        <Button Content="Start" Command="{Binding StartCommand}" Grid.Column="0" Grid.Row="1"/>
         <ProgressBar Grid.Column="1" Grid.Row="1"/>
-        <Button Content="Cancel" Click="{Binding CancelCommand} " Grid.Column="2" Grid.Row="1"/>
+        <Button Content="Cancel" Command="{Binding CancelCommand}" Grid.Column="2" Grid.Row="1"/>
         <TreeView Grid.ColumnSpan="3" Grid.Row="3">
        
         </TreeView>
