@@ -14,6 +14,8 @@ namespace Duplicator
         #region Fields
 
         private string path;
+        private int percents;
+        private bool isCancelEnabled = false;
 
         private ICommand _browseCommand;
         private ICommand _startCommand;
@@ -33,6 +35,33 @@ namespace Duplicator
                 RaisePropertyChanged("Path");
             }
         }
+
+        public int Percents
+        {
+            get
+            {
+                return percents;
+            }
+            set
+            {
+                percents = value;
+                RaisePropertyChanged("Percents");
+            }
+        }
+
+        public bool IsCancelEnabled
+        {
+            get
+            {
+                return isCancelEnabled;
+            }
+            set
+            {
+                isCancelEnabled = value;
+                RaisePropertyChanged("IsCancelEnabled");
+            }
+        }
+
         public ICommand BrowseCommand
         {
             get
@@ -96,7 +125,11 @@ namespace Duplicator
         public void StartExecute()
         {
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
-            Worker.RunWorkerAsync(Path);
+            IsCancelEnabled = true;
+            if (!Worker.IsBusy)
+                Worker.RunWorkerAsync(Path);
+            else
+                MessageBox.Show("Can't run the worker twice!");
         }
 
         /// <summary>
@@ -105,6 +138,7 @@ namespace Duplicator
         public void CancelExecute()
         {
             Worker.CancelAsync();
+            IsCancelEnabled = false;
         }
 
         public void OnWorkerProgressUpdate(int percents)
@@ -115,6 +149,7 @@ namespace Duplicator
 
         public void OnWorkerComplete()
         {
+            IsCancelEnabled = false;
             MessageBox.Show("Completed!");
         }
 
