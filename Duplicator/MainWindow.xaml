@@ -17,8 +17,8 @@
         <TextBox Margin="5" Text="{Binding Path=Path, Mode=TwoWay}" Grid.Column="1" Grid.Row="0"/>
         <Button Margin="5" Content="Browse..." Command="{Binding BrowseCommand}" Grid.Column="2" Grid.Row="0"/>
         <Button Margin="5" Content="Start" Command="{Binding StartCommand}" Grid.Column="0" Grid.Row="1"/>
-        <ProgressBar Margin="5" Grid.Column="1" Grid.Row="1"/>
-        <Button Margin="5" Content="Cancel" Command="{Binding CancelCommand}" Grid.Column="2" Grid.Row="1"/>
+        <ProgressBar Margin="5" Value="{Binding Path=Percents}" Grid.Column="1" Grid.Row="1"/>
+        <Button Margin="5" Content="Cancel" Command="{Binding CancelCommand}" IsEnabled="{Binding Path=IsCancelEnabled}" Grid.Column="2" Grid.Row="1"/>
         <TreeView Grid.ColumnSpan="3" Grid.Row="3">
        
         </TreeView>
