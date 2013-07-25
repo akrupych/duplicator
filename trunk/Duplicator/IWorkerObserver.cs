@@ -25,6 +25,6 @@ namespace Duplicator
         /// <summary>
         /// Worker finished its work
         /// </summary>
-        void OnWorkerComplete();
+        void OnWorkerComplete(IEnumerable<IEnumerable<CheckedFile>> Duplicates);
     }
 }

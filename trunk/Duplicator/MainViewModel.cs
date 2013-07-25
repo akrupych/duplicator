@@ -147,7 +147,7 @@ namespace Duplicator
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
         }
 
-        public void OnWorkerComplete()
+        public void OnWorkerComplete(IEnumerable<IEnumerable<CheckedFile>> Duplicates)
         {
             IsCancelEnabled = false;
             MessageBox.Show("Completed!");
