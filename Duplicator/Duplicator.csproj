@@ -68,6 +68,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="CheckedFile.cs" />
     <Compile Include="DuplicatesFinder.cs">
       <SubType>Component</SubType>
     </Compile>

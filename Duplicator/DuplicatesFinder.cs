@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Duplicator
 {
@@ -20,7 +21,9 @@ namespace Duplicator
         /// Contains possible duplicates during size checking.
         /// long key is for size, list value contains file pathes with that size
         /// </summary>
-        private Dictionary<long, List<string>> PossibleDuplicates { get; set; }
+        private Dictionary<long, List<CheckedFile>> PossibleDuplicates { get; set; }
+
+        private IEnumerable<IEnumerable<CheckedFile>> Duplicates { get; set; }
 
         /// <summary>
         /// Initial event handlers setup
@@ -34,7 +37,7 @@ namespace Duplicator
             DoWork += new DoWorkEventHandler(OnDoWork);
             ProgressChanged += new ProgressChangedEventHandler(OnProgressChanged);
             RunWorkerCompleted += new RunWorkerCompletedEventHandler(OnRunWorkerCompleted);
-            PossibleDuplicates = new Dictionary<long, List<string>>();
+            PossibleDuplicates = new Dictionary<long, List<CheckedFile>>();
         }
 
         /// <summary>
@@ -59,6 +62,7 @@ namespace Duplicator
             CleanUpPossibleDuplicates();
             // signal that preparations are finished and the heavy part is about to begin \m/_
             ReportProgress(0);
+            CalculateChecksums();
         }
 
         /// <summary>
@@ -74,7 +78,7 @@ namespace Duplicator
         /// </summary>
         private void OnRunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            Observer.OnWorkerComplete();
+            Observer.OnWorkerComplete(Duplicates);
         }
 
         /// <summary>
@@ -91,8 +95,8 @@ namespace Duplicator
                 try
                 {
                     if (PossibleDuplicates.ContainsKey(file.Length))
-                        PossibleDuplicates[file.Length].Add(file.FullName);
-                    else PossibleDuplicates.Add(file.Length, new List<string> { file.FullName });
+                        PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
+                    else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
                 }
                 catch { }
             }
@@ -113,6 +117,22 @@ namespace Duplicator
             foreach (long key in keys)
                 if (PossibleDuplicates[key].Count == 1)
                     PossibleDuplicates.Remove(key);
+        }
+
+        private void CalculateChecksums()
+        {
+            foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
+            {
+                List<CheckedFile> filesWithTheSameSize = item.Value;
+                foreach (CheckedFile file in filesWithTheSameSize)
+                {
+                    // set MD5 field
+                }
+                Duplicates = from file in filesWithTheSameSize
+                                 group file by file.Hash into grouped
+                                 where grouped.Count() > 1
+                                 select grouped;
+            }
         }
     }
 }
