@@ -14,10 +14,12 @@ namespace Duplicator
     {
         #region Fields
 
-        private ObservableCollection <?????????????????????????> collection;
+        private ObservableCollection<string> collection;
         private string path;
         private int percents;
         private bool isCancelEnabled = false;
+        private bool isProgressIndeterminate = false;
+        private bool isProgressBarEnabled = false;
 
         private ICommand _browseCommand;
         private ICommand _startCommand;
@@ -29,7 +31,7 @@ namespace Duplicator
 
         #region Properties
 
-        public ObservableCollection<??????????????????????????> Collection
+        public ObservableCollection<string> Collection
         {
             get 
             {
@@ -41,7 +43,6 @@ namespace Duplicator
                 RaisePropertyChanged("Collection");
             }
         }
-
 
         public string Path
         {
@@ -79,6 +80,32 @@ namespace Duplicator
             {
                 isCancelEnabled = value;
                 RaisePropertyChanged("IsCancelEnabled");
+            }
+        }
+
+        public bool IsProgressIndeterminate
+        {
+            get
+            {
+                return isProgressIndeterminate;
+            }
+            set
+            {
+                isProgressIndeterminate = value;
+                RaisePropertyChanged("IsProgressIndeterminate");
+            }
+        }
+
+        public bool IsProgressBarEnabled
+        {
+            get
+            {
+                return isProgressBarEnabled;
+            }
+            set
+            {
+                isProgressBarEnabled = value;
+                RaisePropertyChanged("IsProgressBarEnabled");
             }
         }
 
@@ -146,6 +173,7 @@ namespace Duplicator
         {
             System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.WaitCursor;
             IsCancelEnabled = true;
+            IsProgressIndeterminate = true;
             if (!Worker.IsBusy)
                 Worker.RunWorkerAsync(Path);
             else
@@ -159,6 +187,7 @@ namespace Duplicator
         {
             Worker.CancelAsync();
             IsCancelEnabled = false;
+            IsProgressIndeterminate = false;
             Percents = 0;
         }
 
@@ -171,6 +200,7 @@ namespace Duplicator
         public void OnWorkerComplete(IEnumerable<IEnumerable<CheckedFile>> Duplicates)
         {
             IsCancelEnabled = false;
+            IsProgressIndeterminate = false;
             MessageBox.Show("Completed!");
         }
 
