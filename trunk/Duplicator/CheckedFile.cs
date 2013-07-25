@@ -9,7 +9,7 @@ namespace Duplicator
     {
         public string Path { get; set; }
 
-        public string Hash { get; set; }
+        public byte[] Hash { get; set; }
 
         public CheckedFile(string path)
         {
