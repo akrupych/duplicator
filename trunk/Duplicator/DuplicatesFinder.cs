@@ -134,6 +134,7 @@ namespace Duplicator
 
         private void CalculateChecksums()
         {
+            List < IEnumerable < IEnumerable < CheckedFile >>> list = new List<IEnumerable<IEnumerable<CheckedFile>>>();
             foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
             {
                 List<CheckedFile> filesWithTheSameSize = item.Value;
@@ -146,16 +147,13 @@ namespace Duplicator
                             file.Hash = md5.ComputeHash(stream);
                         }
                     }
-                }
-               
-                // THIS CODE DOESN'T WORK
-                /*var duplicates = from file in filesWithTheSameSize
+                }            
+                var duplicates = from file in filesWithTheSameSize
                              group file by file.Hash into grouped
-                             where grouped.Count() > 1
                              select grouped;
-                 * */
-                
+                list.Add(duplicates);              
             }
+            Duplicates = list.SelectMany(x => x).ToList();
         }
     }
 }
