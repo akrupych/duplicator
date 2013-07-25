@@ -58,11 +58,15 @@ namespace Duplicator
             }
             // group all files by size (changes PossibleDuplicates)
             AnalizeFileSizes(new DirectoryInfo(root));
+            if (CancellationPending) return;
             // remove files unique by size (changes PossibleDuplicates)
             CleanUpPossibleDuplicates();
+            if (CancellationPending) return;
             // signal that preparations are finished and the heavy part is about to begin \m/_
             ReportProgress(0);
+            if (CancellationPending) return;
             CalculateChecksums();
+            if (CancellationPending) return;
         }
 
         /// <summary>
@@ -88,22 +92,23 @@ namespace Duplicator
         /// <param name="root">Folder to traverse</param>
         private void AnalizeFileSizes(DirectoryInfo root)
         {
-            // we can also use Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
-            // to get all file pathes and then find file sizes
-            foreach (FileInfo file in root.GetFiles())
+            if (CancellationPending) return;
+            try
             {
-                try
+                // we can also use Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
+                // to get all file pathes and then find file sizes
+                foreach (FileInfo file in root.GetFiles())
                 {
                     if (PossibleDuplicates.ContainsKey(file.Length))
                         PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
                     else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
                 }
-                catch { }
+                // we can also use Parallel.For(0, root.GetDirectories().Length, i => { AnalizeFileSizes(root.GetDirectories()[i]); });
+                // for adding some performance; though it must be checked
+                foreach (DirectoryInfo directory in root.GetDirectories())
+                    AnalizeFileSizes(directory);
             }
-            // we can also use Parallel.For(0, root.GetDirectories().Length, i => { AnalizeFileSizes(root.GetDirectories()[i]); });
-            // for adding some performance; though it must be checked
-            foreach (DirectoryInfo directory in root.GetDirectories())
-                AnalizeFileSizes(directory);
+            catch { }
         }
 
         /// <summary>
@@ -129,9 +134,9 @@ namespace Duplicator
                     // set MD5 field
                 }
                 Duplicates = from file in filesWithTheSameSize
-                                 group file by file.Hash into grouped
-                                 where grouped.Count() > 1
-                                 select grouped;
+                             group file by file.Hash into grouped
+                             where grouped.Count() > 1
+                             select grouped;
             }
         }
     }
