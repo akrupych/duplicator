@@ -139,6 +139,7 @@ namespace Duplicator
         {
             Worker.CancelAsync();
             IsCancelEnabled = false;
+            Percents = 0;
         }
 
         public void OnWorkerProgressUpdate(int percents)
