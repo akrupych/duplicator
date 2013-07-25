@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Diagnostics;
 
 namespace Duplicator
 {
@@ -103,10 +104,8 @@ namespace Duplicator
                         PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
                     else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
                 }
-                // we can also use Parallel.For(0, root.GetDirectories().Length, i => { AnalizeFileSizes(root.GetDirectories()[i]); });
-                // for adding some performance; though it must be checked
-                foreach (DirectoryInfo directory in root.GetDirectories())
-                    AnalizeFileSizes(directory);
+                // parallel execution notably increases performance
+                Parallel.ForEach<DirectoryInfo>(root.GetDirectories(), directory => AnalizeFileSizes(directory));
             }
             catch { }
         }
