@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Diagnostics;
 
 namespace Duplicator
@@ -55,6 +56,14 @@ namespace Duplicator
             if (root == null)
             {
                 Observer.OnWorkerThrownException(new ArgumentNullException());
+                return;
+            }
+            if (CancellationPending)
+            {
+                // Set the e.Cancel flag so that the WorkerCompleted event
+                // knows that the process was cancelled.
+                e.Cancel = true;
+                ReportProgress(0);
                 return;
             }
             // group all files by size (changes PossibleDuplicates)
@@ -130,12 +139,22 @@ namespace Duplicator
                 List<CheckedFile> filesWithTheSameSize = item.Value;
                 foreach (CheckedFile file in filesWithTheSameSize)
                 {
-                    // set MD5 field
+                    using (var md5 = MD5.Create())
+                    {
+                        using (var stream = File.OpenRead(file.Path))
+                        {
+                            file.Hash = md5.ComputeHash(stream);
+                        }
+                    }
                 }
-                Duplicates = from file in filesWithTheSameSize
+               
+                // THIS CODE DOESN'T WORK
+                /*var duplicates = from file in filesWithTheSameSize
                              group file by file.Hash into grouped
                              where grouped.Count() > 1
                              select grouped;
+                 * */
+                
             }
         }
     }
