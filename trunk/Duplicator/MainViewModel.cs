@@ -6,6 +6,7 @@ using GalaSoft.MvvmLight;
 using System.Windows.Input;
 using GalaSoft.MvvmLight.Command;
 using System.Windows.Forms;
+using System.Collections.ObjectModel;
 
 namespace Duplicator
 {
@@ -13,6 +14,7 @@ namespace Duplicator
     {
         #region Fields
 
+        private ObservableCollection <> collection;
         private string path;
         private int percents;
         private bool isCancelEnabled = false;
@@ -22,6 +24,24 @@ namespace Duplicator
         private ICommand _cancelCommand;
 
         private DuplicatesFinder Worker { get; set; }
+        
+        #endregion
+
+        #region Properties
+
+        public ObservableCollection<> Collection
+        {
+            get 
+            {
+                return collection;
+            }
+            set
+            {
+                collection = value;
+                RaisePropertyChanged("Collection");
+            }
+        }
+
 
         public string Path
         {
