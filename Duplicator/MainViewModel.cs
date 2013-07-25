@@ -14,7 +14,7 @@ namespace Duplicator
     {
         #region Fields
 
-        private ObservableCollection <> collection;
+        private ObservableCollection <?????????????????????????> collection;
         private string path;
         private int percents;
         private bool isCancelEnabled = false;
@@ -29,7 +29,7 @@ namespace Duplicator
 
         #region Properties
 
-        public ObservableCollection<> Collection
+        public ObservableCollection<??????????????????????????> Collection
         {
             get 
             {
