@@ -27,8 +27,6 @@ namespace Duplicator
 
         private IEnumerable<IEnumerable<CheckedFile>> Duplicates { get; set; }
 
-        private long totalSize;
-
         /// <summary>
         /// Initial event handlers setup
         /// </summary>
@@ -51,6 +49,8 @@ namespace Duplicator
         /// </summary>
         private void OnDoWork(object sender, DoWorkEventArgs e)
         {
+            Statistics.Reset();
+            Statistics.StartTimer();
             // clear previous results
             PossibleDuplicates.Clear();
             // first, check received path
@@ -60,14 +60,7 @@ namespace Duplicator
                 Observer.OnWorkerThrownException(new ArgumentNullException());
                 return;
             }
-            if (CancellationPending)
-            {
-                // Set the e.Cancel flag so that the WorkerCompleted event
-                // knows that the process was cancelled.
-                e.Cancel = true;
-                ReportProgress(0);
-                return;
-            }
+            if (CancellationPending) return;
             // group all files by size (changes PossibleDuplicates)
             AnalizeFileSizes(new DirectoryInfo(root));
             if (CancellationPending) return;
@@ -77,7 +70,9 @@ namespace Duplicator
             // signal that preparations are finished and the heavy part is about to begin \m/_
             ReportProgress(0);
             if (CancellationPending) return;
+            Statistics.Checkout();
             CalculateChecksums();
+            Statistics.StopTimer();
             if (CancellationPending) return;
         }
 
@@ -111,9 +106,14 @@ namespace Duplicator
                 // to get all file pathes and then find file sizes
                 foreach (FileInfo file in root.GetFiles())
                 {
-                    if (PossibleDuplicates.ContainsKey(file.Length))
-                        PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
-                    else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
+                    Statistics.Increment("Files");
+                    try
+                    {
+                        if (PossibleDuplicates.ContainsKey(file.Length))
+                            PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
+                        else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
+                    }
+                    catch { }
                 }
                 // parallel execution notably increases performance
                 Parallel.ForEach<DirectoryInfo>(root.GetDirectories(), directory => AnalizeFileSizes(directory));
@@ -136,7 +136,7 @@ namespace Duplicator
 
         private void CalculateChecksums()
         {
-            totalSize = CalculateTotalSize();
+            long totalSize = CalculateTotalSize();
             long analyzedSize = 0;
             int percents = 0;
             List < IEnumerable < IEnumerable < CheckedFile >>> list = new List<IEnumerable<IEnumerable<CheckedFile>>>();
