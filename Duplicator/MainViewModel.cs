@@ -195,6 +195,8 @@ namespace Duplicator
         {
             if (percents == 0)
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
+            IsProgressIndeterminate = false;
+            Percents = percents;
         }
 
         public void OnWorkerComplete(IEnumerable<IEnumerable<CheckedFile>> Duplicates)
@@ -202,6 +204,7 @@ namespace Duplicator
             IsCancelEnabled = false;
             IsProgressIndeterminate = false;
             MessageBox.Show("Completed!");
+            Percents = 0;
         }
 
         public void OnWorkerThrownException(Exception e)

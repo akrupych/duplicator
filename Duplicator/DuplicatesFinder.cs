@@ -27,6 +27,8 @@ namespace Duplicator
 
         private IEnumerable<IEnumerable<CheckedFile>> Duplicates { get; set; }
 
+        private long totalSize;
+
         /// <summary>
         /// Initial event handlers setup
         /// </summary>
@@ -84,7 +86,7 @@ namespace Duplicator
         /// </summary>
         private void OnProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Observer.OnWorkerProgressUpdate(0);
+            Observer.OnWorkerProgressUpdate(e.ProgressPercentage);
         }
 
         /// <summary>
@@ -134,6 +136,9 @@ namespace Duplicator
 
         private void CalculateChecksums()
         {
+            totalSize = CalculateTotalSize();
+            long analyzedSize = 0;
+            int percents = 0;
             List < IEnumerable < IEnumerable < CheckedFile >>> list = new List<IEnumerable<IEnumerable<CheckedFile>>>();
             foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
             {
@@ -147,13 +152,31 @@ namespace Duplicator
                             file.Hash = md5.ComputeHash(stream);
                         }
                     }
-                }            
+                    analyzedSize += item.Key;
+                    percents = Convert.ToInt32(analyzedSize * 100 / totalSize);
+                    ReportProgress(percents);
+                    if (CancellationPending) return;
+                }
                 var duplicates = from file in filesWithTheSameSize
                              group file by file.Hash into grouped
                              select grouped;
                 list.Add(duplicates);              
             }
             Duplicates = list.SelectMany(x => x).ToList();
+        }
+
+        /// <summary>
+        /// Calculates size of all files for which md5 will be calculated
+        /// </summary>
+        /// <returns>total size</returns>
+        private long CalculateTotalSize()
+        {
+            long totalSize = 0;
+            foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
+            {
+                totalSize += item.Key * item.Value.Count;
+            }    
+            return totalSize;
         }
     }
 }
