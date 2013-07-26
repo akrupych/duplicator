@@ -203,7 +203,8 @@ namespace Duplicator
         {
             IsCancelEnabled = false;
             IsProgressIndeterminate = false;
-            MessageBox.Show("Completed!");
+            MessageBox.Show(Statistics.GetWork("Files") + " files processed in "
+                + (Statistics.GetTime() / 1000) + " seconds.", "Completed!");
             Percents = 0;
         }
 
