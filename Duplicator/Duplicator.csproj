@@ -36,10 +36,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="GalaSoft.MvvmLight, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>bin\Debug\GalaSoft.MvvmLight.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Windows.Forms" />
@@ -60,7 +56,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Statistics.cs" />
+    <Compile Include="Model\Duplicate.cs" />
+    <Compile Include="ViewModel\DuplicateViewModel.cs" />
+    <Compile Include="Model\Statistics.cs" />
+    <Compile Include="ViewModel\RelayCommand.cs" />
+    <Compile Include="ViewModel\ViewModelBase.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -69,12 +69,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="CheckedFile.cs" />
-    <Compile Include="DuplicatesFinder.cs">
+    <Compile Include="Model\CheckedFile.cs" />
+    <Compile Include="Model\DuplicatesFinder.cs">
       <SubType>Component</SubType>
     </Compile>
-    <Compile Include="IWorkerObserver.cs" />
-    <Compile Include="MainViewModel.cs" />
+    <Compile Include="Model\IWorkerObserver.cs" />
+    <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
