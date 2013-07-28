@@ -29,16 +29,6 @@
             </Label.Content>
         </Label>
         <TreeView Grid.ColumnSpan="3" Grid.Row="4" ItemsSource="{Binding Path=DuplicatesCollection}">
-            <!--<TreeView.Resources>
-                <HierarchicalDataTemplate x:Key="ChildTemplate" >
-                    <TextBlock FontStyle="Italic" Text="{Binding Path=FileName}" />
-                </HierarchicalDataTemplate>
-                <HierarchicalDataTemplate x:Key="NameTemplate" 
-            ItemsSource="{Binding Path=Duplicates}" 
-            ItemTemplate="{StaticResource ChildTemplate}">
-                    <TextBlock Text="{Binding Path=FileName}" FontWeight="Bold" />
-                </HierarchicalDataTemplate>
-            </TreeView.Resources>-->
             <TreeView.ItemContainerStyle>
                 <Style TargetType="{x:Type TreeViewItem}">
                     <Setter Property="IsExpanded" Value="True" />

@@ -216,12 +216,26 @@ namespace Duplicator
                 DuplicateViewModel duplicateVM = new DuplicateViewModel();
                 duplicateVM.Duplicates = new ObservableCollection<Duplicate>();
                 foreach (CheckedFile file in list)
-                {
-                    duplicateVM.DuplicateName = file.Path;
+                {          
                     duplicateVM.Duplicates.Add(new Duplicate() {FileName = file.Path});
                 }
+                duplicateVM.DuplicateName = GetFileNames(list);
                 DuplicatesCollection.Add(duplicateVM);
             }
+        }
+
+        private string GetFileNames(IEnumerable<CheckedFile> list)
+        {
+            string res = String.Empty;
+            string name;
+            foreach (CheckedFile file in list)
+            {
+                name = file.Path.Substring(file.Path.LastIndexOf('\\') + 1);
+                if(!res.Contains(name))
+                    res += name + ", ";
+            }
+            res = res.Remove(res.Length - 2);
+            return res;
         }
 
         public void OnWorkerThrownException(Exception e)
