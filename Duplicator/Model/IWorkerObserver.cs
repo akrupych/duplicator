@@ -14,7 +14,7 @@ namespace Duplicator
         /// Progress has changed
         /// </summary>
         /// <param name="percents">New progress value</param>
-        void OnWorkerProgressUpdate(int percents);
+        void OnWorkerProgressUpdate(int percents, string task);
 
         /// <summary>
         /// Exception was thrown

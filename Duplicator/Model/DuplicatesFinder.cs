@@ -60,7 +60,8 @@ namespace Duplicator
                 Observer.OnWorkerThrownException(new ArgumentNullException());
                 return;
             }
-            if (CancellationPending) return;
+            if (CancellationPending) return;          
+            ReportProgress(0, "");
             // group all files by size (changes PossibleDuplicates)
             AnalizeFileSizes(new DirectoryInfo(root));
             if (CancellationPending) return;
@@ -68,31 +69,12 @@ namespace Duplicator
             CleanUpPossibleDuplicates();
             if (CancellationPending) return;
             // signal that preparations are finished and the heavy part is about to begin 
-            ReportProgress(0);
+            ReportProgress(0, "");
             if (CancellationPending) return;
             Statistics.Checkout();
             CalculateChecksums();
-            CompareByteToByte();
             Statistics.StopTimer();
             if (CancellationPending) return;
-        }
-
-        private void CompareByteToByte()
-        {
-            
-        }
-
-        public static bool FilesContentsAreEqual(FileInfo fileInfo1, FileInfo fileInfo2)
-        {
-            bool result;
-            using (var file1 = fileInfo1.OpenRead())
-            {
-                using (var file2 = fileInfo2.OpenRead())
-                {
-                    result = StreamsContentsAreEqual(file1, file2);
-                }
-            }
-            return result;
         }
 
         /// <summary>
@@ -100,8 +82,8 @@ namespace Duplicator
         /// </summary>
         private void OnProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            Observer.OnWorkerProgressUpdate(e.ProgressPercentage);
-           
+            string task = (string)e.UserState;
+            Observer.OnWorkerProgressUpdate(e.ProgressPercentage, task);          
         }
 
         /// <summary>
@@ -120,6 +102,7 @@ namespace Duplicator
         private void AnalizeFileSizes(DirectoryInfo root)
         {
             if (CancellationPending) return;
+            ReportProgress(0, "analyzing file sizes...");
             try
             {
                 // we can also use Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
@@ -132,6 +115,11 @@ namespace Duplicator
                         if (PossibleDuplicates.ContainsKey(file.Length))
                             PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
                         else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
+                    }
+                    catch (DirectoryNotFoundException)
+                    {
+                        Observer.OnWorkerThrownException(new DirectoryNotFoundException());
+                        return;
                     }
                     catch { }
                 }
@@ -177,77 +165,14 @@ namespace Duplicator
                     }
                     analyzedSize += item.Key;
                     percents = Convert.ToInt32(analyzedSize * 100 / totalSize);
-                    ReportProgress(percents);
+                    ReportProgress(percents, String.Format("Calculating checksums: {0}%", percents));
                     if (CancellationPending) return;
                 }
-                //var duplicates = from file in filesWithTheSameSize
-                //                 group file by file.Hash into grouped
-                //                 select grouped;
                 var duplicates = filesWithTheSameSize.GroupBy(file => BitConverter.ToString(file.Hash)).Where(group => group.Count() > 1).Select(group => group.ToList()).ToList();
                 list.Add(duplicates);              
             }
             Duplicates = list.SelectMany(x => x).ToList();
         }
-
-        private static bool StreamsContentsAreEqual(Stream stream1, Stream stream2)
-        {
-            const int bufferSize = 2048 * 2;
-            var buffer1 = new byte[bufferSize];
-            var buffer2 = new byte[bufferSize];
-
-            while (true)
-            {
-                int count1 = stream1.Read(buffer1, 0, bufferSize);
-                int count2 = stream2.Read(buffer2, 0, bufferSize);
-
-                if (count1 != count2)
-                {
-                    return false;
-                }
-
-                if (count1 == 0)
-                {
-                    return true;
-                }
-
-                int iterations = (int)Math.Ceiling((double)count1 / sizeof(Int64));
-                for (int i = 0; i < iterations; i++)
-                {
-                    if (BitConverter.ToInt64(buffer1, i * sizeof(Int64)) != BitConverter.ToInt64(buffer2, i * sizeof(Int64)))
-                    {
-                        return false;
-                    }
-                }
-            }
-        }
-
-        private static bool StreamsContentsAreEqual2(Stream stream1, Stream stream2)
-        {
-            const int bufferSize = 2048 * 2;
-            var buffer1 = new byte[bufferSize];
-            var buffer2 = new byte[bufferSize];
-
-            while (true)
-            {
-                int count1 = stream1.Read(buffer1, 0, bufferSize);
-                int count2 = stream2.Read(buffer2, 0, bufferSize);
-                if (count1 != count2)
-                {
-                    return false; // check true
-                }
-                if (count1 == 0)
-                {
-                    return true;
-                }
-                for (int i = 0; i < count1; i++)
-                {
-                    if (buffer1[i] != buffer2[i])
-                        return false;
-                }
-                return Array.Equals(buffer1, buffer2);
-            }
-        }
-
 
         /// <summary>
         /// Calculates size of all files for which md5 will be calculated

@@ -38,13 +38,18 @@ namespace Duplicator
 
         public static void Increment(string work)
         {
-            if (Works.ContainsKey(work)) Works[work]++;
-            else Works.Add(work, 1);
+            if (Works.ContainsKey(work)) 
+                Works[work]++;
+            else 
+                Works.Add(work, 1);
         }
 
         public static int GetWork(string work)
         {
-            return Works[work];
+            if (Works.ContainsKey(work))
+                return Works[work];
+            else
+                return 0;
         }
 
         public static long GetTime()
