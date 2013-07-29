@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Diagnostics;
+using System.Collections.Concurrent;
 
 namespace Duplicator
 {
@@ -23,8 +24,10 @@ namespace Duplicator
         /// Contains possible duplicates during size checking.
         /// long key is for size, list value contains file pathes with that size
         /// </summary>
-        private Dictionary<long, List<CheckedFile>> PossibleDuplicates { get; set; }
-
+        private ConcurrentDictionary<long, List<CheckedFile>> PossibleDuplicates { get; set; }
+        /// <summary>
+        /// Contains final array with pathes of duplicates
+        /// </summary>
         private IEnumerable<IEnumerable<CheckedFile>> Duplicates { get; set; }
 
         /// <summary>
@@ -39,7 +42,7 @@ namespace Duplicator
             DoWork += new DoWorkEventHandler(OnDoWork);
             ProgressChanged += new ProgressChangedEventHandler(OnProgressChanged);
             RunWorkerCompleted += new RunWorkerCompletedEventHandler(OnRunWorkerCompleted);
-            PossibleDuplicates = new Dictionary<long, List<CheckedFile>>();
+            PossibleDuplicates = new ConcurrentDictionary<long, List<CheckedFile>>();
         }
 
         /// <summary>
@@ -72,6 +75,8 @@ namespace Duplicator
             ReportProgress(0, "");
             if (CancellationPending) return;
             Statistics.Checkout();
+            // calculates MD5 checksum for all possible duplicates
+            // and fills the final collection with groups of duplicates
             CalculateChecksums();
             Statistics.StopTimer();
             if (CancellationPending) return;
@@ -114,8 +119,7 @@ namespace Duplicator
                     {
                         if (PossibleDuplicates.ContainsKey(file.Length))
                             PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
-                        else 
-                            PossibleDuplicates[file.Length] = new List<CheckedFile>(){ new CheckedFile(file.FullName) };
+                        else PossibleDuplicates[file.Length] = new List<CheckedFile>(){ new CheckedFile(file.FullName) };
                     }
                     catch (DirectoryNotFoundException)
                     {
@@ -138,10 +142,10 @@ namespace Duplicator
         {
             long[] keys = new long[PossibleDuplicates.Count];
             PossibleDuplicates.Keys.CopyTo(keys, 0);
+            List<CheckedFile> wtf = new List<CheckedFile>();
             foreach (long key in keys)
-                if (PossibleDuplicates.ContainsKey(key) 
-                    && (PossibleDuplicates[key] == null || PossibleDuplicates[key].Count == 1))
-                    PossibleDuplicates.Remove(key);
+                if (PossibleDuplicates[key].Count == 1)
+                    PossibleDuplicates.TryRemove(key, out wtf);
         }
 
         /// <summary>
@@ -152,15 +156,11 @@ namespace Duplicator
             long totalSize = CalculateTotalSize();
             long analyzedSize = 0;
             int percents = 0;
+            object syncLock = new object();
             List<IEnumerable<IEnumerable<CheckedFile>>> list = new List<IEnumerable<IEnumerable<CheckedFile>>>();
-            //foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
-            //Parallel.ForEach(PossibleDuplicates, item =>
-            Parallel.For(0, PossibleDuplicates.Keys.Count, i =>
+            Parallel.ForEach(PossibleDuplicates, item =>
             {
-                long key = PossibleDuplicates.Keys.ElementAt(i);
-                KeyValuePair<long, List<CheckedFile>> item = new KeyValuePair<long,List<CheckedFile>>(key, PossibleDuplicates[key]);
                 List<CheckedFile> filesWithTheSameSize = item.Value;
-                //Parallel.ForEach(filesWithTheSameSize, file =>
                 foreach (CheckedFile file in filesWithTheSameSize)
                 {
                     using (var md5 = MD5.Create())
@@ -176,7 +176,10 @@ namespace Duplicator
                     if (CancellationPending) return;
                 }
                 var duplicates = filesWithTheSameSize.GroupBy(file => BitConverter.ToString(file.Hash)).Where(group => group.Count() > 1).Select(group => group.ToList()).ToList();
-                list.Add(duplicates);
+                lock (syncLock)
+                {
+                    list.Add(duplicates);
+                }
             });
             Duplicates = list.SelectMany(x => x).ToList();
         }
