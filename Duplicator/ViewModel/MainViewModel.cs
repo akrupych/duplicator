@@ -194,7 +194,7 @@ namespace Duplicator
         {
             if (percents == 0)
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
-            if (task == "analyzing file sizes...")
+            if (task == "Analyzing file sizes...")
                 IsProgressIndeterminate = true;
             else
                 IsProgressIndeterminate = false;

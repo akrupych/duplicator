@@ -102,7 +102,7 @@ namespace Duplicator
         private void AnalizeFileSizes(DirectoryInfo root)
         {
             if (CancellationPending) return;
-            ReportProgress(0, "analyzing file sizes...");
+            ReportProgress(0, "Analyzing file sizes...");
             try
             {
                 // we can also use Directory.GetFiles(root, "*.*", SearchOption.AllDirectories)
@@ -114,8 +114,8 @@ namespace Duplicator
                     {
                         if (PossibleDuplicates.ContainsKey(file.Length))
                             PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
-                        else //PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
-                            PossibleDuplicates[file.Length] = new List<CheckedFile>();
+                        else 
+                            PossibleDuplicates[file.Length] = new List<CheckedFile>(){ new CheckedFile(file.FullName) };
                     }
                     catch (DirectoryNotFoundException)
                     {
@@ -136,11 +136,11 @@ namespace Duplicator
         /// </summary>
         private void CleanUpPossibleDuplicates()
         {
-            long[] keys = new long[PossibleDuplicates.Keys.Count];
+            long[] keys = new long[PossibleDuplicates.Count];
             PossibleDuplicates.Keys.CopyTo(keys, 0);
             foreach (long key in keys)
-                if (PossibleDuplicates.ContainsKey(key) &&
-                    (PossibleDuplicates[key] == null || PossibleDuplicates[key].Count == 1))
+                if (PossibleDuplicates.ContainsKey(key) 
+                    && (PossibleDuplicates[key] == null || PossibleDuplicates[key].Count == 1))
                     PossibleDuplicates.Remove(key);
         }
 
