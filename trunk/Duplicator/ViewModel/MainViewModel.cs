@@ -18,7 +18,7 @@ namespace Duplicator
         private int percents;
         private bool isCancelEnabled = false;
         private bool isProgressIndeterminate = false;
-        private string task = "processing";
+        private string task;
 
         private ICommand _browseCommand;
         private ICommand _startCommand;
@@ -190,18 +190,24 @@ namespace Duplicator
             Percents = 0;
         }
 
-        public void OnWorkerProgressUpdate(int percents)
+        public void OnWorkerProgressUpdate(int percents, string task)
         {
             if (percents == 0)
                 System.Windows.Forms.Cursor.Current = System.Windows.Forms.Cursors.Default;
-            IsProgressIndeterminate = false;
+            if (task == "analyzing file sizes...")
+                IsProgressIndeterminate = true;
+            else
+                IsProgressIndeterminate = false;
             Percents = percents;
+            Task = task;
         }
 
         public void OnWorkerComplete(IEnumerable<IEnumerable<CheckedFile>> Duplicates)
         {
             IsCancelEnabled = false;
             IsProgressIndeterminate = false;
+            Task = Statistics.GetWork("Files") + " files processed in "
+                + (Statistics.GetTime() / 1000) + " seconds.";
             MessageBox.Show(Statistics.GetWork("Files") + " files processed in "
                 + (Statistics.GetTime() / 1000) + " seconds.", "Completed!");
             Percents = 0;
@@ -211,6 +217,8 @@ namespace Duplicator
         private void GetDuplicates(IEnumerable<IEnumerable<CheckedFile>> Duplicates)
         {
             DuplicatesCollection = new ObservableCollection<DuplicateViewModel>();
+            if (Duplicates == null)
+                return;
             foreach (IEnumerable<CheckedFile> list in Duplicates)
             {
                 DuplicateViewModel duplicateVM = new DuplicateViewModel();
