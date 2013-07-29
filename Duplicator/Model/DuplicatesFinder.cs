@@ -83,7 +83,7 @@ namespace Duplicator
         private void OnProgressChanged(object sender, ProgressChangedEventArgs e)
         {
             string task = (string)e.UserState;
-            Observer.OnWorkerProgressUpdate(e.ProgressPercentage, task);          
+            Observer.OnWorkerProgressUpdate(e.ProgressPercentage, task);
         }
 
         /// <summary>
@@ -114,7 +114,8 @@ namespace Duplicator
                     {
                         if (PossibleDuplicates.ContainsKey(file.Length))
                             PossibleDuplicates[file.Length].Add(new CheckedFile(file.FullName));
-                        else PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
+                        else //PossibleDuplicates.Add(file.Length, new List<CheckedFile> { new CheckedFile(file.FullName) });
+                            PossibleDuplicates[file.Length] = new List<CheckedFile>();
                     }
                     catch (DirectoryNotFoundException)
                     {
@@ -135,10 +136,11 @@ namespace Duplicator
         /// </summary>
         private void CleanUpPossibleDuplicates()
         {
-            long[] keys = new long[PossibleDuplicates.Count];
+            long[] keys = new long[PossibleDuplicates.Keys.Count];
             PossibleDuplicates.Keys.CopyTo(keys, 0);
             foreach (long key in keys)
-                if (PossibleDuplicates[key].Count == 1)
+                if (PossibleDuplicates.ContainsKey(key) &&
+                    (PossibleDuplicates[key] == null || PossibleDuplicates[key].Count == 1))
                     PossibleDuplicates.Remove(key);
         }
 
@@ -150,10 +152,15 @@ namespace Duplicator
             long totalSize = CalculateTotalSize();
             long analyzedSize = 0;
             int percents = 0;
-            List < IEnumerable < IEnumerable < CheckedFile >>> list = new List<IEnumerable<IEnumerable<CheckedFile>>>();
-            foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
+            List<IEnumerable<IEnumerable<CheckedFile>>> list = new List<IEnumerable<IEnumerable<CheckedFile>>>();
+            //foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
+            //Parallel.ForEach(PossibleDuplicates, item =>
+            Parallel.For(0, PossibleDuplicates.Keys.Count, i =>
             {
+                long key = PossibleDuplicates.Keys.ElementAt(i);
+                KeyValuePair<long, List<CheckedFile>> item = new KeyValuePair<long,List<CheckedFile>>(key, PossibleDuplicates[key]);
                 List<CheckedFile> filesWithTheSameSize = item.Value;
+                //Parallel.ForEach(filesWithTheSameSize, file =>
                 foreach (CheckedFile file in filesWithTheSameSize)
                 {
                     using (var md5 = MD5.Create())
@@ -169,8 +176,8 @@ namespace Duplicator
                     if (CancellationPending) return;
                 }
                 var duplicates = filesWithTheSameSize.GroupBy(file => BitConverter.ToString(file.Hash)).Where(group => group.Count() > 1).Select(group => group.ToList()).ToList();
-                list.Add(duplicates);              
-            }
+                list.Add(duplicates);
+            });
             Duplicates = list.SelectMany(x => x).ToList();
         }
 
@@ -184,7 +191,7 @@ namespace Duplicator
             foreach (KeyValuePair<long, List<CheckedFile>> item in PossibleDuplicates)
             {
                 totalSize += item.Key * item.Value.Count;
-            }    
+            }
             return totalSize;
         }
     }
